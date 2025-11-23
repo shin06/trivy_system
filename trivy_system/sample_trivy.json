@@ -1,0 +1,78 @@
+{
+  "SchemaVersion": 2,
+  "ArtifactName": "python:3.9-alpine",
+  "ArtifactType": "container_image",
+  "Metadata": {
+    "OS": {
+      "Family": "alpine",
+      "Name": "3.18.4"
+    },
+    "ImageID": "sha256:1234567890abcdef",
+    "DiffIDs": [
+      "sha256:abcdef1234567890"
+    ],
+    "RepoTags": [
+      "python:3.9-alpine"
+    ],
+    "RepoDigests": [
+      "python@sha256:abcdef1234567890"
+    ],
+    "ImageConfig": {
+      "architecture": "amd64",
+      "created": "2023-11-01T00:00:00Z",
+      "os": "linux",
+      "rootfs": {
+        "type": "layers",
+        "diff_ids": [
+          "sha256:abcdef1234567890"
+        ]
+      },
+      "config": {}
+    }
+  },
+  "Results": [
+    {
+      "Target": "python:3.9-alpine (alpine 3.18.4)",
+      "Class": "os-pkgs",
+      "Type": "alpine",
+      "Vulnerabilities": [
+        {
+          "VulnerabilityID": "CVE-2023-1234",
+          "PkgName": "libssl1.1",
+          "InstalledVersion": "1.1.1t-r0",
+          "FixedVersion": "1.1.1u-r0",
+          "Layer": {
+            "DiffID": "sha256:abcdef1234567890"
+          },
+          "Severity": "CRITICAL",
+          "Title": "OpenSSL: Buffer overflow",
+          "Description": "A buffer overflow vulnerability was found in OpenSSL."
+        },
+        {
+          "VulnerabilityID": "CVE-2023-5678",
+          "PkgName": "busybox",
+          "InstalledVersion": "1.36.0-r0",
+          "FixedVersion": "1.36.1-r0",
+          "Layer": {
+            "DiffID": "sha256:abcdef1234567890"
+          },
+          "Severity": "HIGH",
+          "Title": "BusyBox: Out of bounds read",
+          "Description": "An out of bounds read was found in BusyBox."
+        },
+        {
+          "VulnerabilityID": "CVE-2023-9012",
+          "PkgName": "zlib",
+          "InstalledVersion": "1.2.13-r0",
+          "FixedVersion": "1.2.13-r1",
+          "Layer": {
+            "DiffID": "sha256:abcdef1234567890"
+          },
+          "Severity": "MEDIUM",
+          "Title": "zlib: Heap overflow",
+          "Description": "A heap overflow was found in zlib."
+        }
+      ]
+    }
+  ]
+}

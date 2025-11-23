@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+  trivy-visualizer:
+    build: .
+    ports:
+      - "8501:8501"
+    volumes:
+      - .:/app
+      - ./trivy_scan:/trivy_scan
