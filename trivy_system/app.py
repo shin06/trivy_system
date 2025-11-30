@@ -3,9 +3,56 @@ import json
 import pandas as pd
 import plotly.express as px
 import subprocess
+import asyncio
 import os
+from streamlit_oauth import OAuth2Component
 
 st.set_page_config(page_title="Trivy Scan Visualizer", layout="wide")
+
+# --- Authentication ---
+CLIENT_ID = "trivy-client"
+CLIENT_SECRET = ""
+AUTHORIZE_URL = "http://localhost:8001/realms/trivy-realm/protocol/openid-connect/auth"
+TOKEN_URL = "http://localhost:8001/realms/trivy-realm/protocol/openid-connect/token"
+REVOKE_TOKEN_URL = "http://localhost:8001/realms/trivy-realm/protocol/openid-connect/logout"
+
+oauth2 = OAuth2Component(CLIENT_ID, CLIENT_SECRET, AUTHORIZE_URL, TOKEN_URL, TOKEN_URL, REVOKE_TOKEN_URL)
+
+if 'token' not in st.session_state or st.session_state.token is None:
+    result = oauth2.authorize_button(
+        name="Login with Keycloak",
+        icon="https://www.keycloak.org/resources/images/keycloak_logo_480x108.png",
+        redirect_uri="http://localhost:8501",
+        scope="openid email profile",
+        key="keycloak",
+    )
+    
+    if result:
+        st.session_state.token = result
+        st.rerun()
+    else:
+        st.warning("Please log in to access the Trivy Scan Visualizer.")
+        st.stop()
+
+logout_url = f"{REVOKE_TOKEN_URL}?post_logout_redirect_uri=http://localhost:8501&client_id={CLIENT_ID}"
+if st.sidebar.button("Logout"):
+    # Clear local session state
+    if 'token' in st.session_state:
+        del st.session_state.token
+    # Redirect to Keycloak logout
+    st.markdown(f'<meta http-equiv="refresh" content="0;url={logout_url}">', unsafe_allow_html=True)
+    st.stop()
+
+token = st.session_state.get('token')
+if token:
+    # streamlit-oauth returns the token nested in a 'token' key in some versions/configurations
+    access_token = token.get('access_token') or token.get('token', {}).get('access_token')
+    
+    if not access_token:
+        st.error("Login failed: No access token received.")
+        if st.button("Reset Login"):
+            del st.session_state.token
+            st.rerun()
 
 st.title("🛡️ Trivy Scan Visualizer")
 
@@ -160,7 +207,7 @@ if data:
                     color='Severity',
                     color_discrete_map=severity_colors
                 )
-                st.plotly_chart(fig_severity, use_container_width=True)
+                st.plotly_chart(fig_severity, width="stretch")
         
         with col_chart2:
             st.subheader("Top Affected Packages")
@@ -169,7 +216,7 @@ if data:
                 top_pkgs.columns = ['PkgName', 'Count']
                 fig_pkgs = px.bar(top_pkgs, x='Count', y='PkgName', orientation='h', title='Top 10 Vulnerable Packages')
                 fig_pkgs.update_layout(yaxis={'categoryorder':'total ascending'})
-                st.plotly_chart(fig_pkgs, use_container_width=True)
+                st.plotly_chart(fig_pkgs, width="stretch")
 
         # Data Table
         st.subheader("Detailed Vulnerabilities")
@@ -187,7 +234,7 @@ if data:
 
         st.dataframe(
             df[display_cols].style.map(color_severity, subset=['Severity']), 
-            use_container_width=True
+            width="stretch"
         )
 
 else:
